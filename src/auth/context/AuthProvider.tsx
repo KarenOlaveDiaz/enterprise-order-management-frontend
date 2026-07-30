@@ -1,53 +1,81 @@
 import {
+  useEffect,
   useMemo,
   useState,
   type PropsWithChildren,
 } from 'react';
-import { AuthContext } from './auth-context';
+import {
+  getProfileRequest,
+  loginRequest,
+} from '../services/auth.service';
 import type {
   AuthContextValue,
   LoginCredentials,
   User,
 } from '../types/auth.types';
+import { AuthContext } from './auth-context';
 
-const MOCK_USER: User = {
-  id: '1',
-  name: 'Portfolio Administrator',
-  email: 'admin@orderflow.dev',
-  role: 'admin',
-};
+const TOKEN_STORAGE_KEY = 'orderflow_access_token';
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(
+    () => localStorage.getItem(TOKEN_STORAGE_KEY),
+  );
+  const [isLoading, setIsLoading] = useState(true);
 
-  async function login(credentials: LoginCredentials): Promise<void> {
-    await new Promise<void>((resolve) => {
-      window.setTimeout(resolve, 600);
-    });
+  useEffect(() => {
+    async function restoreSession(): Promise<void> {
+      if (!accessToken) {
+        setIsLoading(false);
+        return;
+      }
 
-    const validCredentials =
-      credentials.email === 'admin@orderflow.dev' &&
-      credentials.password === 'Admin123!';
-
-    if (!validCredentials) {
-      throw new Error('Invalid email or password');
+      try {
+        const profile = await getProfileRequest(accessToken);
+        setUser(profile);
+      } catch {
+        localStorage.removeItem(TOKEN_STORAGE_KEY);
+        setAccessToken(null);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    setUser(MOCK_USER);
+    void restoreSession();
+  }, [accessToken]);
+
+  async function login(
+    credentials: LoginCredentials,
+  ): Promise<void> {
+    const response = await loginRequest(credentials);
+
+    localStorage.setItem(
+      TOKEN_STORAGE_KEY,
+      response.accessToken,
+    );
+
+    setAccessToken(response.accessToken);
+    setUser(response.user);
   }
 
   function logout(): void {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    setAccessToken(null);
     setUser(null);
   }
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
-      isAuthenticated: Boolean(user),
+      accessToken,
+      isAuthenticated: Boolean(user && accessToken),
+      isLoading,
       login,
       logout,
     }),
-    [user],
+    [user, accessToken, isLoading],
   );
 
   return (

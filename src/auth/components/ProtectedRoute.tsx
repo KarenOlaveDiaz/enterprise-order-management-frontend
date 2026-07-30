@@ -6,9 +6,15 @@ interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated } = useAuth();
+export function ProtectedRoute({
+  children,
+}: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+
+  if (isLoading) {
+    return <p>Loading session...</p>;
+  }
 
   if (!isAuthenticated) {
     return (
