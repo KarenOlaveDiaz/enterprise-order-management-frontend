@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
+import { ProtectedRoute } from '../../auth/components/ProtectedRoute';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { HomePage } from '../../pages/HomePage/HomePage';
 import { LoginPage } from '../../pages/LoginPage/LoginPage';
@@ -11,8 +12,17 @@ export function AppRouter() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="orders" element={<OrdersPage />} />
           <Route path="login" element={<LoginPage />} />
+
+          <Route
+            path="orders"
+            element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
