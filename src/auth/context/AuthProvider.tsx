@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -46,25 +47,26 @@ export function AuthProvider({ children }: PropsWithChildren) {
     void restoreSession();
   }, [accessToken]);
 
-  async function login(
-    credentials: LoginCredentials,
-  ): Promise<void> {
-    const response = await loginRequest(credentials);
+  const login = useCallback(
+    async (credentials: LoginCredentials): Promise<void> => {
+      const response = await loginRequest(credentials);
+  
+      localStorage.setItem(
+        TOKEN_STORAGE_KEY,
+        response.accessToken,
+      );
+  
+      setAccessToken(response.accessToken);
+      setUser(response.user);
+    },
+    [],
+  );
 
-    localStorage.setItem(
-      TOKEN_STORAGE_KEY,
-      response.accessToken,
-    );
-
-    setAccessToken(response.accessToken);
-    setUser(response.user);
-  }
-
-  function logout(): void {
+  const logout = useCallback((): void => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     setAccessToken(null);
     setUser(null);
-  }
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -75,7 +77,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       login,
       logout,
     }),
-    [user, accessToken, isLoading],
+    [user, accessToken, isLoading, login, logout],
   );
 
   return (

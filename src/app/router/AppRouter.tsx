@@ -4,7 +4,7 @@ import { MainLayout } from '../../components/layout/MainLayout';
 import { HomePage } from '../../pages/HomePage/HomePage';
 import { LoginPage } from '../../pages/LoginPage/LoginPage';
 import { NotFoundPage } from '../../pages/NotFoundPage/NotFoundPage';
-import { OrdersPage } from '../../pages/OrdersPage/OrdersPage';
+import { OrdersPage } from '../../orders/pages/OrderPage';
 
 export function AppRouter() {
   return (
