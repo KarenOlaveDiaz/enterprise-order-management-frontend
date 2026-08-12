@@ -21,3 +21,12 @@ export interface CreateOrderData {
   product: string;
   quantity: number;
 }
+
+export type OrderSortField =
+  | 'customerName'
+  | 'product'
+  | 'quantity'
+  | 'status'
+  | 'createdAt';
+
+export type SortDirection = 'asc' | 'desc';

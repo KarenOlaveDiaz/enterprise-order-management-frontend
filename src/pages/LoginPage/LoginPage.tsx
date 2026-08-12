@@ -1,41 +1,45 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router';
+import { Navigate } from 'react-router';
 import { useAuth } from '../../auth/hooks/useAuth';
 
-interface LocationState {
-  from?: string;
-}
-
 export function LoginPage() {
-  const { login, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const {
+    isAuthenticated,
+    login,
+  } = useAuth();
 
-  const [email, setEmail] = useState('admin@orderflow.dev');
-  const [password, setPassword] = useState('Admin123!');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const locationState = location.state as LocationState | null;
-  const destination = locationState?.from ?? '/orders';
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    null,
+  );
 
   if (isAuthenticated) {
     return <Navigate to="/orders" replace />;
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
     event.preventDefault();
-    setError('');
-    setIsSubmitting(true);
+
+    if (isSubmitting) {
+      return;
+    }
 
     try {
-      await login({ email, password });
-      navigate(destination, { replace: true });
-    } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : 'An unexpected error occurred',
+      setIsSubmitting(true);
+      setErrorMessage(null);
+
+      await login({
+        email: email.trim(),
+        password,
+      });
+    } catch {
+      setErrorMessage(
+        'Unable to sign in with the provided credentials.',
       );
     } finally {
       setIsSubmitting(false);
@@ -43,54 +47,109 @@ export function LoginPage() {
   }
 
   return (
-    <section className="auth-page">
-      <div className="auth-card">
-        <p className="eyebrow">Secure access</p>
-        <h1>Login</h1>
+    <section className="login-page">
+     
 
-        <p className="auth-description">
-          Use the demonstration credentials to access the protected order
-          management module.
-        </p>
+      <div className="login-panel">
+        <div className="auth-card auth-card--login">
+          <header className="login-heading">
+            <span className="eyebrow">
+              Secure access
+            </span>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <label>
-            Email
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              required
-            />
-          </label>
+            <h2>Welcome back</h2>
 
-          <label>
-            Password
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
-              required
-            />
-          </label>
-
-          {error && (
-            <p className="form-error" role="alert">
-              {error}
+            <p>
+              Sign in to access the OrderFlow management platform.
             </p>
-          )}
+          </header>
 
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Signing in...' : 'Sign in'}
+          <form
+            className="auth-form"
+            onSubmit={(event) => {
+              void handleSubmit(event);
+            }}
+          >
+            <label>
+              Email address
+
+              <input
+                type="email"
+                autoComplete="username"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
+                required
+              />
+            </label>
+
+            <label>
+              Password
+
+              <div className="password-field">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                  }}
+                  required
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  aria-label={
+                    showPassword
+                      ? 'Hide password'
+                      : 'Show password'
+                  }
+                  onClick={() => {
+                    setShowPassword((current) => !current);
+                  }}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </label>
+
+            {errorMessage && (
+              <p className="form-error" role="alert">
+                {errorMessage}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? 'Signing in...'
+                : 'Sign in'}
+            </button>
+          </form>
+
+          <div className="login-security-note">
+            <span className="system-status-dot" />
+            Protected authentication
+          </div>
+
+          <button
+            type="button"
+            className="demo-login-button"
+            onClick={() => {
+              setEmail('demo@orderflow.dev');
+              setPassword('Demo123!');
+            }}
+          >
+            Use demo account
           </button>
-        </form>
 
-        <div className="demo-credentials">
-          <strong>Demo credentials</strong>
-          <span>admin@orderflow.dev</span>
-          <span>Admin123!</span>
+          <p className="demo-login-note">
+            Portfolio reviewers can use the demo account to explore OrderFlow.
+          </p>
         </div>
       </div>
     </section>

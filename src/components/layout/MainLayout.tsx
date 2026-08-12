@@ -8,9 +8,13 @@ export function MainLayout() {
     <div className="app-layout">
       <header className="app-header">
         <div className="container header-content">
-          <NavLink className="brand" to="/">
-            OrderFlow
-          </NavLink>
+        <NavLink className="brand" to="/">
+          <span className="brand-mark">O</span>
+
+          <span>
+            Order<span className="brand-highlight">Flow</span>
+          </span>
+        </NavLink>
 
           <nav className="navigation" aria-label="Main navigation">
             <NavLink to="/">Home</NavLink>
@@ -31,9 +35,15 @@ export function MainLayout() {
           </nav>
 
           {user && (
-            <span className="current-user">
-              {user.name} · {user.role}
-            </span>
+            <div className="current-user">
+              <span>{user.name}</span>
+
+              {user.role === 'DEMO' && (
+                <span className="demo-role-badge">
+                  Demo
+                </span>
+              )}
+            </div>
           )}
         </div>
       </header>
@@ -43,8 +53,19 @@ export function MainLayout() {
       </main>
 
       <footer className="app-footer">
-        <div className="container">
-          Enterprise Order Management Portfolio
+        <div className="container footer-content">
+          <div>
+            <strong>OrderFlow</strong>
+            <span>Enterprise Order Management</span>
+          </div>
+
+          <div className="footer-meta">
+            <span>
+              Designed &amp; Developed by Karen Olave
+            </span>
+
+            <span>Portfolio Project · 2026</span>
+          </div>
         </div>
       </footer>
     </div>
