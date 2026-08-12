@@ -1,24 +1,51 @@
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderStatusSelect } from './OrderStatusSelect';
 import { DeleteOrderButton } from './DeleteOrderButton';
-import type { Order ,OrderStatus} from '../types/order.types';
+import type {
+  Order,
+  OrderSortField,
+  SortDirection,
+} from '../types/order.types';
 
 interface OrderTableProps {
   orders: Order[];
+  canDelete: boolean;
+  sortField: OrderSortField;
+  sortDirection: SortDirection;
+  onSort: (field: OrderSortField) => void;
   onUpdateStatus: (
     orderId: string,
-    status: OrderStatus,
+    status: Order['status'],
   ) => Promise<void>;
-  onDeleteOrder: (orderId: string) => Promise<void>
+  onDeleteOrder: (orderId: string) => Promise<void>;
 }
 
 export function OrderTable({
   orders,
+  canDelete,
+  sortField,
+  sortDirection,
+  onSort,
   onUpdateStatus,
   onDeleteOrder,
 }: OrderTableProps) {
+  function getSortIndicator(field: OrderSortField): string {
+    if (sortField !== field) {
+      return '';
+    }
+  
+    return sortDirection === 'asc' ? ' ↑' : ' ↓';
+  }
+
   if (orders.length === 0) {
-    return <p>No orders were found.</p>;
+    return (
+      <div className="orders-empty-state">
+        <strong>No orders found</strong>
+        <p>
+          Try adjusting your search or filters, or create a new order.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -26,13 +53,75 @@ export function OrderTable({
       <table className="orders-table">
         <thead>
           <tr>
-            <th>Customer</th>
+           <th>
+              <button
+                type="button"
+                className="table-sort-button"
+                onClick={() => {
+                  onSort('customerName');
+                }}
+              >
+                Customer
+                {getSortIndicator('customerName')}
+              </button>
+            </th>
+
             <th>Email</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Status</th>
+
+            <th>
+              <button
+                type="button"
+                className="table-sort-button"
+                onClick={() => {
+                  onSort('product');
+                }}
+              >
+                Product
+                {getSortIndicator('product')}
+              </button>
+            </th>
+
+            <th>
+              <button
+                type="button"
+                className="table-sort-button"
+                onClick={() => {
+                  onSort('quantity');
+                }}
+              >
+                Quantity
+                {getSortIndicator('quantity')}
+              </button>
+            </th>
+
+            <th>
+              <button
+                type="button"
+                className="table-sort-button"
+                onClick={() => {
+                  onSort('status');
+                }}
+              >
+                Status
+                {getSortIndicator('status')}
+              </button>
+            </th>
+
             <th>Change status</th>
-            <th>Created</th>
+
+            <th>
+              <button
+                type="button"
+                className="table-sort-button"
+                onClick={() => {
+                  onSort('createdAt');
+                }}
+              >
+                Created
+                {getSortIndicator('createdAt')}
+              </button>
+            </th>
+
             <th>Actions</th>
           </tr>
         </thead>
@@ -64,10 +153,16 @@ export function OrderTable({
               </td>
 
               <td>
+              {canDelete ? (
                 <DeleteOrderButton
                   order={order}
                   onDeleteOrder={onDeleteOrder}
                 />
+              ) : (
+                <span className="restricted-action">
+                  Restricted
+                </span>
+              )}
               </td>
             </tr>
           ))}

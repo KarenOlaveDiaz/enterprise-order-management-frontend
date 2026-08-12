@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import type { Order } from '../types/order.types';
 
 interface DeleteOrderButtonProps {
@@ -10,25 +11,20 @@ export function DeleteOrderButton({
   order,
   onDeleteOrder,
 }: DeleteOrderButtonProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(
     null,
   );
 
   async function handleDelete(): Promise<void> {
-    const shouldDelete = window.confirm(
-      `Delete the order for ${order.customerName}?`,
-    );
-
-    if (!shouldDelete) {
-      return;
-    }
-
     try {
       setIsDeleting(true);
       setErrorMessage(null);
 
       await onDeleteOrder(order.id);
+
+      setIsDialogOpen(false);
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -42,20 +38,38 @@ export function DeleteOrderButton({
   }
 
   return (
-    <div>
+    <>
       <button
         type="button"
-        disabled={isDeleting}
+        className="delete-order-button"
         onClick={() => {
-          void handleDelete();
+          setIsDialogOpen(true);
         }}
       >
-        {isDeleting ? 'Deleting...' : 'Delete'}
+        Delete
       </button>
 
       {errorMessage && (
-        <p role="alert">{errorMessage}</p>
+        <p role="alert" className="form-error">
+          {errorMessage}
+        </p>
       )}
-    </div>
+
+      <ConfirmDialog
+        isOpen={isDialogOpen}
+        title="Delete order"
+        description={`Are you sure you want to delete the order for ${order.customerName}? This action cannot be undone.`}
+        confirmLabel="Delete order"
+        isConfirming={isDeleting}
+        onCancel={() => {
+          if (!isDeleting) {
+            setIsDialogOpen(false);
+          }
+        }}
+        onConfirm={() => {
+          void handleDelete();
+        }}
+      />
+    </>
   );
 }

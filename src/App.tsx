@@ -1,11 +1,14 @@
-import { AuthProvider } from './auth/context/AuthProvider';
 import { AppRouter } from './app/router/AppRouter';
+import { AuthProvider } from './auth/context/AuthProvider';
+import { NotificationProvider } from './notifications/context/NotificationProvider';
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRouter />
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </NotificationProvider>
   );
 }
 
