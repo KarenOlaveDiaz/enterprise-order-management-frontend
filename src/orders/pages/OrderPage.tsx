@@ -7,7 +7,7 @@ import {
 import { OrdersSummary } from '../components/OrdersSummary';
 import { OrderTable } from '../components/OrderTable';
 import { useOrders } from '../hooks/useOrders';
-import { useNotification } from '../../notifications/hook/useNotification';
+import { useNotification } from '../../notifications/hooks/useNotification';
 import { OrdersPagination } from '../components/OrdersPagination';
 
 import type {
