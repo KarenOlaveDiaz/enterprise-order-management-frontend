@@ -9,6 +9,7 @@ import type {
 
 interface OrderTableProps {
   orders: Order[];
+  canEdit: boolean;
   canDelete: boolean;
   sortField: OrderSortField;
   sortDirection: SortDirection;
@@ -22,6 +23,7 @@ interface OrderTableProps {
 
 export function OrderTable({
   orders,
+  canEdit,
   canDelete,
   sortField,
   sortDirection,
@@ -139,10 +141,16 @@ export function OrderTable({
               </td>
 
               <td>
-                <OrderStatusSelect
-                  order={order}
-                  onUpdateStatus={onUpdateStatus}
-                 />
+                {canEdit ? (
+                  <OrderStatusSelect
+                    order={order}
+                    onUpdateStatus={onUpdateStatus}
+                  />
+                ) : (
+                  <span className="restricted-action">
+                    Read only
+                  </span>
+                )}
               </td>
 
               <td>
