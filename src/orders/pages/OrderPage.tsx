@@ -240,9 +240,11 @@ const sortedOrders = useMemo(() => {
 
       <OrdersSummary orders={orders} />
 
-      <CreateOrderForm
-        onCreateOrder={handleCreateOrder}
-      />
+      {!isDemo && (
+        <CreateOrderForm
+          onCreateOrder={handleCreateOrder}
+        />
+      )}
 
       <OrdersFilters
         searchTerm={searchTerm}
@@ -258,6 +260,7 @@ const sortedOrders = useMemo(() => {
 
       <OrderTable
         orders={paginatedOrders}
+        canEdit={!isDemo}
         canDelete={!isDemo}
         sortField={sortField}
         sortDirection={sortDirection}
