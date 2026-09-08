@@ -32,6 +32,10 @@ const capabilities = [
   },
 ];
 
+const apiDocsUrl =
+  import.meta.env.VITE_API_DOCS_URL ??
+  'http://localhost:3000/api/docs';
+
 export function HomePage() {
   return (
     <div className="home-page">
@@ -67,7 +71,7 @@ export function HomePage() {
 
             <a
               className="button button--secondary"
-              href="http://localhost:3000/api/docs"
+              href={apiDocsUrl}
               target="_blank"
               rel="noreferrer"
             >
