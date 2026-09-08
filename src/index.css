@@ -1959,7 +1959,8 @@
   }
   
   .confirm-dialog {
-    width: min(460px, 100%);
+    width: min(560px, calc(100vw - 48px));
+    max-width: 100%;
   
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -1979,15 +1980,23 @@
   }
   
   .confirm-dialog p {
+    max-width: 100%;
+
+    margin-top: 0;
     margin-bottom: 24px;
   
     color: var(--color-text-secondary);
   
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+
     line-height: 1.6;
   }
   
   .confirm-dialog-actions {
     display: flex;
+    flex-wrap: wrap;
   
     justify-content: flex-end;
   
@@ -2377,8 +2386,13 @@
     }
   
     /* Dialog */
+
+    .dialog-backdrop {
+      padding: 16px;
+    }
   
     .confirm-dialog {
+      width: 100%;
       padding: 20px;
     }
   
